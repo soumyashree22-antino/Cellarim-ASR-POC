@@ -65,8 +65,7 @@ def run_pipeline(file_content, cfg):
     # 6. Structure Prediction (Optional)
     if not skip_folding:
         with st.status("Step 5: 3D Structure Prediction (ESMFold)...", expanded=False) as status:
-            structure.fold_candidates(top_k, cfg)
-            struct_metrics = structure_scoring.score_geometries(cfg)
+            struct_metrics = structure.analyze_candidates(cfg, ranking=top_k)
             final_candidates = ranking.final_rank(signals, struct_metrics, cfg)
             final_candidates.to_csv(top_k_csv, index=True)
             status.update(label="Step 5: 3D Structure Validated", state="complete")
@@ -81,8 +80,9 @@ def run_pipeline(file_content, cfg):
             status.update(label="Step 6: Report Generated", state="complete")
             return report_path, top_k_csv
         except Exception as e:
-            st.error(f"LLM Analysis failed (did you set your API key?): {e}")
-            status.update(label="Step 6: LLM Failed", state="error")
+            import traceback
+            st.error(f"Error during report generation:\n\n{traceback.format_exc()}")
+            status.update(label="Step 6: Report Failed", state="error")
             return None, top_k_csv
 
 
