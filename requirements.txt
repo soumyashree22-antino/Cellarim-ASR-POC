@@ -31,3 +31,4 @@ structlog==24.4.0
 rich==13.8.1
 pytest==8.3.3
 ruff==0.6.9
+streamlit==1.38.0
