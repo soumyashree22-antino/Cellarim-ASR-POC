@@ -1,28 +1,18 @@
-# Pinned Python dependencies for the ASR POC (Python 3.11)
-# Bioinformatics
-biopython==1.84
-# Data / numerics
-pandas==2.2.3
-numpy==1.26.4
-pyarrow==17.0.0
-scipy==1.13.1
-# Similarity / clustering utilities (no supervised training)
-scikit-learn==1.5.2
-umap-learn==0.5.6
-# Protein foundation models (inference-only)
-# Skipped heavy dependencies (torch, fair-esm, transformers) for Streamlit Cloud
-omegaconf==2.3.0
-# Config / CLI / IO
-pydantic==2.9.2
-pydantic-settings==2.5.2
-pyyaml==6.0.2
-requests==2.32.3
-tenacity==8.5.0
-# Visualization / notebooks
-matplotlib==3.9.2
-# Logging / dev
-structlog==24.4.0
-rich==13.8.1
-pytest==8.3.3
-ruff==0.6.9
-streamlit==1.38.0
+# Unpinned dependencies to ensure Python 3.14.5 compatibility on Streamlit Cloud
+biopython
+pandas
+numpy
+pyarrow
+scipy
+scikit-learn
+umap-learn
+omegaconf
+pydantic
+pydantic-settings
+pyyaml
+requests
+tenacity<9
+matplotlib
+structlog
+rich
+streamlit
