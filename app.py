@@ -38,7 +38,7 @@ def run_pipeline(file_content, cfg):
     # 3. Phylogeny
     with st.status("Step 2: Building Phylogenetic Tree (IQ-TREE)...", expanded=False) as status:
         # Note: We temporarily force fast-mode via config to ensure it runs fast on Streamlit
-        cfg.target.ultrafast_bootstrap = 0 
+        cfg.phylogeny.ultrafast_bootstrap = 0 
         tree_path = phylo.build_tree(cfg, msa=msa_path)
         status.update(label="Step 2: Tree Built", state="complete")
         
