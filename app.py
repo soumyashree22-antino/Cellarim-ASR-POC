@@ -73,9 +73,8 @@ def run_pipeline(file_content, cfg):
         st.info("Skipping 3D structure prediction step.")
         
     # 7. LLM Scoring & Reporting
-    with st.status("Step 6: AI Scientist Analysis (Gemini)...", expanded=False) as status:
+    with st.status("Step 6: Generating Scientific Report...", expanded=False) as status:
         try:
-            llm_scoring.llm_score_candidates(cfg, final_candidates)
             report_path = report.write_report(cfg, final_candidates)
             status.update(label="Step 6: Report Generated", state="complete")
             return report_path, top_k_csv
