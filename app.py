@@ -108,22 +108,20 @@ else:
 
 # Display Results
 st.divider()
-col1, col2 = st.columns([1, 1])
 
-with col1:
-    st.header("🏆 Ranked Candidates")
-    ranking_csv = Path("reports/candidate_ranking.csv")
-    if ranking_csv.exists():
-        df = pd.read_csv(ranking_csv)
-        st.dataframe(df, use_container_width=True)
-    else:
-        st.write("No ranking data yet.")
+st.header("🏆 Ranked Candidates")
+ranking_csv = Path("reports/candidate_ranking.csv")
+if ranking_csv.exists():
+    df = pd.read_csv(ranking_csv)
+    st.dataframe(df, use_container_width=True)
+else:
+    st.write("No ranking data yet.")
 
-with col2:
-    st.header("📄 Scientific Report")
-    report_md = Path("reports/scientific_report.md")
-    if report_md.exists():
-        content = report_md.read_text(encoding="utf-8")
-        st.markdown(content)
-    else:
-        st.write("No scientific report generated yet.")
+st.divider()
+
+st.header("📄 Scientific Report")
+report_md = Path("reports/scientific_report.md")
+if report_md.exists():
+    st.markdown(report_md.read_text())
+else:
+    st.write("No scientific report generated yet.")
