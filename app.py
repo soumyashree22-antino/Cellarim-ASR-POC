@@ -10,7 +10,7 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 from asr_poc.config import load_config
-from asr_poc import phylo, feature_table, ranking, report, embeddings, structure, structure_scoring, llm_scoring
+from asr_poc import phylo, feature_table, ranking, report, embeddings, structure, structure_scoring, llm_scoring, io_utils
 
 st.set_page_config(page_title="Cellarm ASR POC", layout="wide")
 
@@ -39,6 +39,7 @@ def run_pipeline(file_content, cfg):
     with st.status("Step 2: Building Phylogenetic Tree (IQ-TREE)...", expanded=False) as status:
         # Note: We temporarily force fast-mode via config to ensure it runs fast on Streamlit
         cfg.phylogeny.ultrafast_bootstrap = 0 
+        cfg.phylogeny.iqtree_model = "LG"
         tree_path = phylo.build_tree(cfg, msa=msa_path)
         status.update(label="Step 2: Tree Built", state="complete")
         
@@ -50,7 +51,7 @@ def run_pipeline(file_content, cfg):
         
     # 5. Embeddings & Feature Extraction
     with st.status("Step 4: AI Feature Extraction (ESM-2)...", expanded=False) as status:
-        candidates = phylo.io_utils.read_fasta(cfg.paths.ancestral_fasta)
+        candidates = io_utils.read_fasta(cfg.paths.ancestral_fasta)
         signals = feature_table.build_feature_table(cfg, candidates)
         top_k = ranking.rank_candidates_hybrid(cfg, signals)
         
