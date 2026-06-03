@@ -33,6 +33,9 @@ def run_pipeline(file_content, cfg):
     # 2. Alignment
     with st.status("Step 1: Aligning Sequences (MAFFT)...", expanded=False) as status:
         msa_path = phylo.align(cfg, in_fasta=user_fasta)
+        st.write(f"✅ Alignment saved to `{msa_path.name}`")
+        with open(msa_path) as f:
+            st.code("".join([next(f) for _ in range(5)]) + "\n...", language="fasta")
         status.update(label="Step 1: Alignment Complete", state="complete")
         
     # 3. Phylogeny
@@ -41,12 +44,17 @@ def run_pipeline(file_content, cfg):
         cfg.phylogeny.ultrafast_bootstrap = 0 
         cfg.phylogeny.iqtree_model = "LG"
         tree_path = phylo.build_tree(cfg, msa=msa_path)
+        st.write(f"🌲 Tree saved to `{tree_path.name}`")
+        with open(tree_path) as f:
+            st.text(f.read()[:500] + "\n...")
         status.update(label="Step 2: Tree Built", state="complete")
         
     # 4. ASR
     with st.status("Step 3: Reconstructing Ancestors...", expanded=False) as status:
         state_file = phylo.reconstruct_ancestors(cfg, msa=msa_path)
         summary = phylo.build_candidate_pool(cfg, state_file=state_file)
+        st.write("ASR Generation Summary:")
+        st.json(summary)
         status.update(label=f"Step 3: ASR Complete ({summary['candidates']} candidates generated)", state="complete")
         
     # 5. Embeddings & Feature Extraction
@@ -54,6 +62,9 @@ def run_pipeline(file_content, cfg):
         signals = ranking.pre_fold_rank(cfg)
         top_k_ids = ranking.candidates_to_fold(signals, cfg)
         top_k = signals.loc[top_k_ids]
+        
+        st.write(f"Extracted features for {len(signals)} candidates. Top {len(top_k)} selected for folding:")
+        st.dataframe(top_k.head())
         
         # Save initial ranking
         top_k_csv = cfg.paths.reports_dir / "candidate_ranking.csv"
@@ -66,6 +77,9 @@ def run_pipeline(file_content, cfg):
     if not skip_folding:
         with st.status("Step 5: 3D Structure Prediction (ESMFold)...", expanded=False) as status:
             struct_metrics = structure.analyze_candidates(cfg, ranking=top_k)
+            st.write("Calculated 3D structure metrics (Rg, pLDDT, packing density):")
+            st.dataframe(struct_metrics)
+            
             final_candidates = ranking.final_rank(signals, struct_metrics, cfg)
             final_candidates.to_csv(top_k_csv, index=True)
             status.update(label="Step 5: 3D Structure Validated", state="complete")
