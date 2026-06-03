@@ -1,0 +1,97 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Target specification for the ASR POC.
+# Everything family-specific lives here so the pipeline stays configurable:
+# swap this file (or pass --config) to run a different enzyme family.
+# Current target: LIPASE (recommended initial POC target — see enzymes.docx §5).
+# ─────────────────────────────────────────────────────────────────────────────
+
+target:
+  name: lipase
+  description: "Triacylglycerol lipase family (EC 3.1.1.3)"
+  # Seed identity for homolog search. Use a well-characterised reference lipase.
+  reference_uniprot: "P00591"        # Lipase, Rhizomucor miehei (example reference)
+  pfam_id: "PF00151"                 # Lipase (class 3) Pfam family
+  ec_number: "3.1.1.3"
+  # GxSxG nucleophile elbow motif + catalytic triad context (used for the
+  # catalytic-motif filter in WP1). Regex is intentionally permissive.
+  catalytic_motif_regex: "G[A-Z]S[A-Z]G"
+  catalytic_triad: ["Ser", "Asp", "His"]
+
+retrieval:
+  source: uniprot                    # uniprot | blast
+  # UniProt query: reviewed lipases of reasonable length.
+  uniprot_query: "family:lipase AND reviewed:true"
+  max_sequences: 500
+  blast:
+    program: blastp
+    database: nr
+    evalue: 1.0e-5
+    hitlist_size: 500
+
+curation:
+  min_length: 150
+  max_length: 600
+  # Drop sequences flagged as fragments / partial in their description.
+  drop_fragments: true
+  # Redundancy reduction: cluster and keep one representative per identity band.
+  cluster_identity: 0.90
+  # Require the catalytic motif to be present.
+  require_catalytic_motif: true
+
+phylogeny:
+  aligner: mafft                     # mafft
+  mafft_opts: "--auto"
+  iqtree_model: "LG+I+G"            # Fast, high-quality pre-defined model (bypasses ModelFinder)
+  ultrafast_bootstrap: 0
+  asr_engine: iqtree                   # iqtree (default implemented engine) | paml
+  # Posterior-probability threshold below which a site is "ambiguous" and
+  # triggers alternate-sequence generation.
+  ambiguous_pp_threshold: 0.80
+  max_alternates_per_node: 5
+  # Internal nodes to resurrect: "all" or an integer (top-N by branch support).
+  nodes_to_reconstruct: 10
+
+embeddings:
+  provider: local                    # local | api | fallback
+  esm_model_local: "esm2_t12_35M_UR50D"   # CPU-friendly for dev (480-dim)
+  esm_api_url: ""                    # HF / Replicate URL for larger models
+  batch_size: 8
+
+ranking:
+  # Inference-only composite scoring. No supervised training.
+  anchor_uniprot_count: 25           # extant lipases used as the anchor set
+  knn_k: 5                           # candidate -> k-nearest anchors for emb_sim
+  pre_fold_top_k: 10                 # number of candidates ESMFold/AF2 will fold
+  final_top_n: 3                     # candidates surfaced in the report
+  cluster_n: 8                       # KMeans clusters for diversity selection
+  random_state: 42
+  weights:
+    sim: 0.35                        # ESM-2 anchor cosine similarity
+    structure: 0.30                  # ESMFold pLDDT/100
+    motif: 0.15                      # GxSxG catalytic motif + triad spacing
+    conservation: 0.10               # match consensus at conserved columns
+    uncertainty: 0.10                # ASR posterior entropy (subtracted)
+
+report:
+  # Deterministic local templating only. No external APIs.
+  top_n: 3                           # candidates rendered in the report body
+
+structure:
+  folder_provider: api     # esmfold_local (AFDB+local ESMFold) | alphafold | api | local
+  esmfold_api_url: "https://api.esmatlas.com/foldSequence/v1/pdb/"
+  max_structures: 3                  # local ESMFold on CPU: ~2-3 min/seq
+  # Residues defining the active-site neighbourhood for geometry comparison
+  # (resolved per-structure from the catalytic motif; this is a fallback radius).
+  active_site_radius_angstrom: 8.0
+
+llm:
+  provider: gemini               # gemini | openai | claude | fallback
+  model: gemini-2.5-flash
+  api_key_env_var: GEMINI_API_KEY
+  temperature: 0.1
+  max_retries: 3
+
+run:
+  seed: 42
+  # Root output directory; each stage writes under the canonical subdirs.
+  output_root: "."

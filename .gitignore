@@ -1,0 +1,29 @@
+# Generated data & artifacts (kept out of git; reproduced by the notebooks)
+data/raw_sequences/*
+data/curated_sequences/*
+data/alignments/*
+data/phylogeny/*
+data/ancestral_sequences/*
+embeddings/*
+models/*
+structure_predictions/*
+reports/*
+results/*
+# keep the directories themselves
+!**/.gitkeep
+
+# Environments
+.venv/
+venv/
+
+# Caches
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.env
+
+# OS
+.DS_Store

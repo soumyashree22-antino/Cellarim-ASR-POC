@@ -1,0 +1,25 @@
+# Conda environment for the ASR POC.
+# Provides the binary bioinformatics tools that pip cannot install, plus Python.
+# Usage:
+#   conda env create -f environment.yml
+#   conda activate asr-poc
+#   pip install -r requirements.txt   # Python deps pinned separately
+name: asr-poc
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.11
+  # Alignment
+  - mafft=7.526
+  # Phylogenetics
+  - iqtree=2.3.6
+  # Ancestral sequence reconstruction
+  - paml=4.10.7        # codeml for ASR
+  # Optional: FastML (alternative ASR engine referenced in the spec)
+  # - fastml
+  # Structure secondary-structure assignment
+  - dssp=4.4.0
+  - pip
+  - pip:
+      - -r requirements.txt
