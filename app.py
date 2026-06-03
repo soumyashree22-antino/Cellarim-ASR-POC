@@ -12,9 +12,9 @@ if str(ROOT / "src") not in sys.path:
 from asr_poc.config import load_config
 from asr_poc import phylo, feature_table, ranking, report, embeddings, structure, structure_scoring, llm_scoring, io_utils
 
-st.set_page_config(page_title="Cellarm ASR POC", layout="wide")
+st.set_page_config(page_title="Cellarim ASR POC", layout="wide")
 
-st.title("🧬 Cellarm ASR POC: Enzyme Engineering Pipeline")
+st.title("🧬 Cellarim ASR POC: Enzyme Engineering Pipeline")
 st.markdown("Upload your sequences and run the end-to-end AI pipeline to engineer and rank ancestral candidates!")
 
 # Sidebar configuration
@@ -24,7 +24,7 @@ skip_folding = st.sidebar.checkbox("Skip 3D Structure Folding (ESMFold)", value=
 
 def run_pipeline(file_content, cfg):
     # 1. Setup Data
-    user_fasta = cfg.paths.curated_dir / "user_input.fasta"
+    user_fasta = cfg.paths.curated_fasta
     user_fasta.parent.mkdir(parents=True, exist_ok=True)
     user_fasta.write_bytes(file_content)
     
