@@ -31,17 +31,17 @@ def evidence_packet(
     return {
         "candidate_id": candidate_id,
         "sequence_length": len(candidates.get(candidate_id, "")),
-        "rank": int(row["rank"]),
-        "final_score": round(float(row["final_score"]), 4),
+        "rank": int(row.get("rank", 0)),
+        "final_score": round(float(row.get("final_score", row.get("pre_score", 0.0))), 4),
         "signals": {
-            "emb_sim":      round(float(row["emb_sim"]), 4),
-            "struct_conf":  round(float(row["struct_conf"]), 4),
-            "motif":        round(float(row["motif"]), 4),
-            "conservation": round(float(row["conservation"]), 4),
-            "uncertainty":  round(float(row["uncertainty"]), 4),
-            "packing":      round(float(row["packing"]), 4),
+            "emb_sim":      round(float(row.get("emb_sim", 0.0)), 4),
+            "struct_conf":  round(float(row.get("struct_conf", 0.0)), 4),
+            "motif":        round(float(row.get("motif", 0.0)), 4),
+            "conservation": round(float(row.get("conservation", 0.0)), 4),
+            "uncertainty":  round(float(row.get("uncertainty", 0.0)), 4),
+            "packing":      round(float(row.get("packing", 0.0)), 4),
         },
-        "cluster": int(row["cluster"]),
+        "cluster": int(row.get("cluster", 0)),
         "nearest_anchors": [
             {"id": r["anchor_id"], "cosine": round(float(r["cosine"]), 4)}
             for _, r in nbrs.iterrows()
