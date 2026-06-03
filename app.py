@@ -51,9 +51,9 @@ def run_pipeline(file_content, cfg):
         
     # 5. Embeddings & Feature Extraction
     with st.status("Step 4: AI Feature Extraction (ESM-2)...", expanded=False) as status:
-        candidates = io_utils.read_fasta(cfg.paths.ancestral_fasta)
-        signals = feature_table.build_feature_table(cfg, candidates)
-        top_k = ranking.rank_candidates_hybrid(cfg, signals)
+        signals = ranking.pre_fold_rank(cfg)
+        top_k_ids = ranking.candidates_to_fold(signals, cfg)
+        top_k = signals.loc[top_k_ids]
         
         # Save initial ranking
         top_k_csv = cfg.paths.reports_dir / "candidate_ranking.csv"
