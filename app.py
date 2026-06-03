@@ -36,7 +36,7 @@ def run_pipeline(file_content, cfg):
         st.write(f"✅ Alignment saved to `{msa_path.name}`")
         with open(msa_path) as f:
             st.code("".join([next(f) for _ in range(5)]) + "\n...", language="fasta")
-        status.update(label="Step 1: Alignment Complete", state="complete")
+        status.update(label="Step 1: Alignment Complete", state="complete", expanded=True)
         
     # 3. Phylogeny
     with st.status("Step 2: Building Phylogenetic Tree (IQ-TREE)...", expanded=False) as status:
@@ -47,7 +47,7 @@ def run_pipeline(file_content, cfg):
         st.write(f"🌲 Tree saved to `{tree_path.name}`")
         with open(tree_path) as f:
             st.text(f.read()[:500] + "\n...")
-        status.update(label="Step 2: Tree Built", state="complete")
+        status.update(label="Step 2: Tree Built", state="complete", expanded=True)
         
     # 4. ASR
     with st.status("Step 3: Reconstructing Ancestors...", expanded=False) as status:
@@ -55,7 +55,7 @@ def run_pipeline(file_content, cfg):
         summary = phylo.build_candidate_pool(cfg, state_file=state_file)
         st.write("ASR Generation Summary:")
         st.json(summary)
-        status.update(label=f"Step 3: ASR Complete ({summary['candidates']} candidates generated)", state="complete")
+        status.update(label=f"Step 3: ASR Complete ({summary['candidates']} candidates generated)", state="complete", expanded=True)
         
     # 5. Embeddings & Feature Extraction
     with st.status("Step 4: AI Feature Extraction (ESM-2)...", expanded=False) as status:
@@ -71,7 +71,7 @@ def run_pipeline(file_content, cfg):
         top_k_csv.parent.mkdir(parents=True, exist_ok=True)
         top_k.to_csv(top_k_csv, index=True)
         final_candidates = top_k
-        status.update(label="Step 4: AI Feature Extraction Complete", state="complete")
+        status.update(label="Step 4: AI Feature Extraction Complete", state="complete", expanded=True)
 
     # 6. Structure Prediction (Optional)
     if not skip_folding:
@@ -82,7 +82,7 @@ def run_pipeline(file_content, cfg):
             
             final_candidates = ranking.final_rank(signals, struct_metrics, cfg)
             final_candidates.to_csv(top_k_csv, index=True)
-            status.update(label="Step 5: 3D Structure Validated", state="complete")
+            status.update(label="Step 5: 3D Structure Validated", state="complete", expanded=True)
     else:
         st.info("Skipping 3D structure prediction step.")
         
