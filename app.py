@@ -90,8 +90,6 @@ if uploaded_file is not None:
     if st.sidebar.button("🚀 Run AI Engineering Pipeline", use_container_width=True):
         # Clean previous runs
         cfg = load_config(ROOT / "config" / "target.yaml")
-        # Overwrite the input to the uploaded file
-        cfg.paths.msa_fasta = cfg.paths.alignments_dir / "msa.fasta"
         
         # Clear phylogeny directory so IQ-TREE doesn't resume old runs
         if cfg.paths.phylogeny_dir.exists():
